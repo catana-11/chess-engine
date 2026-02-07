@@ -1,12 +1,8 @@
 #include "move_generator.h"
 
-bool move_generator::is_white_piece(int p){
-    return p > 0;
-}
+bool move_generator::is_white_piece(int p){return p > 0;}
 
-bool move_generator::is_black_piece(int p){
-    return p < 0;
-}
+bool move_generator::is_black_piece(int p){return p < 0;}
 
 vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
 
@@ -31,6 +27,15 @@ vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
 
         else if(absPiece == 2) // knight
             generate_knight_moves(board,i,white_turn,moves);
+
+        else if(absPiece == 3) // bishop
+            generate_bishop_moves(board, i, white_turn, moves);
+
+        else if(absPiece == 4)
+            generate_king_moves(board, i, white_turn, moves);
+
+        else if(absPiece == 5)
+            generate_queen_moves(board, i, white_turn, moves);
     }
 
     return moves;
@@ -48,29 +53,39 @@ void move_generator::generate_pawn_moves(Board &board, int pos, bool white_turn,
         moves.push_back({pos, forward, 0});  // from, to, captured_piece
     }
     // if forward is empty i.e ==0 , only then pawn going ahead is valid
-    
 
     // now lets c diagonal capturing
     int diag1 = pos + dir + 1;
     int diag2 = pos + dir - 1;
 
 
+    // checks to avoid wrap arounds
+    int new_row = diag1/8; int new_col = diag1%8;
+    int old_row = pos/8; int old_col = pos%8;
+
     if(diag1>=0 && diag1<64){
-        int target = board.get_piece(diag1); // whats on diag1
-        if(white_turn && is_black_piece(target)) // if it is enemy piece
-            moves.push_back({pos,diag1,target}); // capturing is possible
-        if(!white_turn && is_white_piece(target)) 
-            moves.push_back({pos,diag1,target});
+
+        if (abs(new_col - old_col)==1){
+            int target = board.get_piece(diag1); // whats on diag1
+            if(white_turn && is_black_piece(target)) // if it is enemy piece
+                moves.push_back({pos,diag1,target}); // capturing is possible
+            if(!white_turn && is_white_piece(target)) 
+                moves.push_back({pos,diag1,target});
+        }
     }
 
     // repeat
+    new_row = diag2/8; new_col = diag2%8;
+    old_row = pos/8; old_col = pos%8;
 
     if(diag2>=0 && diag2<64){
-        int target = board.get_piece(diag2);
-        if(white_turn && is_black_piece(target))
-            moves.push_back({pos,diag2,target});
-        if(!white_turn && is_white_piece(target))
-            moves.push_back({pos,diag2,target});
+        if (abs(new_col - old_col)==1){
+            int target = board.get_piece(diag2);
+            if(white_turn && is_black_piece(target))
+                moves.push_back({pos,diag2,target});
+            if(!white_turn && is_white_piece(target))
+                moves.push_back({pos,diag2,target});
+        }
     }
 }
 
@@ -133,7 +148,6 @@ void move_generator::generate_rook_moves(Board &board, int pos, bool white_turn,
             }
             else break;
 
-
             prev = cur;
         } // while will keep appending moves in that direction
     }
@@ -151,16 +165,22 @@ void move_generator::generate_knight_moves(Board &board, int pos, bool white_tur
 
         if(to<0 || to>=64) continue; 
 
-        int piece = board.get_piece(to);
+        int new_row = to/8; int new_col = to%8;
+        int old_row = pos/8; int old_col = pos%8;
 
-        if(piece==0){
-            moves.push_back({pos,to,0});
-        }
-        else{
-            if(white_turn && is_black_piece(piece))
-                moves.push_back({pos,to,piece});
-            if(!white_turn && is_white_piece(piece))
-                moves.push_back({pos,to,piece});
+        if ((abs(new_row - old_row) == 2 && abs(new_col - old_col) == 1) || (abs(new_row - old_row) == 1 && abs(new_col - old_col) == 2)){
+
+            int piece = board.get_piece(to);
+
+            if(piece==0){
+                moves.push_back({pos,to,0});
+            }
+            else{
+                if(white_turn && is_black_piece(piece))
+                    moves.push_back({pos,to,piece});
+                if(!white_turn && is_white_piece(piece))
+                    moves.push_back({pos,to,piece});
+            }
         }
     }
 }
@@ -289,7 +309,6 @@ void move_generator::generate_queen_moves(Board &board, int pos, bool white_turn
     }
 }
 
-
 //////////////////////// KING ////////////////////////
 
 void move_generator::generate_king_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
@@ -300,7 +319,6 @@ void move_generator::generate_king_moves(Board &board, int pos, bool white_turn,
 
         int cur = pos + jumps[i]; // try each jump
         int prev = pos;
-
 
         if(cur<0 ||cur>=64) continue; 
 
@@ -322,7 +340,7 @@ void move_generator::generate_king_moves(Board &board, int pos, bool white_turn,
                     if(!white_turn && is_white_piece(piece)) //capture
                         moves.push_back({pos,cur,piece});
 
-                    break; // if my own piece, then that direction is blocked, so break 
+                    continue; // if my own piece, then that direction is blocked, so break 
                 }
             }
 
@@ -341,7 +359,7 @@ void move_generator::generate_king_moves(Board &board, int pos, bool white_turn,
                     if(!white_turn && is_white_piece(piece)) //capture
                         moves.push_back({pos,cur,piece});
 
-                    break; // if my own piece, then that direction is blocked, so break 
+                    continue; // if my own piece, then that direction is blocked, so break 
                 }
             }
 
@@ -360,9 +378,8 @@ void move_generator::generate_king_moves(Board &board, int pos, bool white_turn,
                     if(!white_turn && is_white_piece(piece)) //capture
                         moves.push_back({pos,cur,piece});
 
-                    break; // if my own piece, then that direction is blocked, so break 
+                    continue; // if my own piece, then that direction is blocked, so break 
                 }
             }
             else continue;
-            prev = cur;
 }
