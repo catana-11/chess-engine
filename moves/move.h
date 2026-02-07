@@ -1,0 +1,10 @@
+#ifndef MOVE_H
+#define MOVE_H
+
+struct Move {
+    int from;
+    int to;
+    int captured_piece;
+};
+
+#endif
