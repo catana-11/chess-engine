@@ -3,20 +3,32 @@
 
 using namespace std;
 
-Move input_handler::get_move_from_user(Board &board) {
+Move input_handler::get_move_from_user(Board &board){
 
-    int from, to;
+    string from, to;
 
-    cout << "Enter FROM square (0-63): ";
-    cin >> from;
+    cout << "Enter move (example: e2 e4): ";
+    cin >> from >> to;
 
-    cout << "Enter TO square (0-63): ";
-    cin >> to;
+    int fromIndex = notation_to_index(from);
+    int toIndex   = notation_to_index(to);
 
     Move move;
-    move.from = from;
-    move.to = to;
-    move.captured_piece = board.get_piece(to);
+    move.from = fromIndex;
+    move.to   = toIndex;
+    move.captured_piece = board.get_piece(toIndex);
 
     return move;
+}
+
+
+int input_handler::notation_to_index(string notation){
+
+    char fileChar = notation[0];   // e.g. 'E'
+    char rankChar = notation[1];   // e.g. '2'
+
+    int file = fileChar - 'a';     // 'a' → 0, 'b' → 1 ...
+    int rank = rankChar - '1';     // '1' → 0, '2' → 1 ...
+
+    return rank * 8 + file;
 }

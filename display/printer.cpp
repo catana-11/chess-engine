@@ -8,67 +8,49 @@ using namespace std;
 
 void Printer::print_board(Board &board){
 
-    cout<<"Current board position: "<<endl;
+    cout << "\nCurrent Board Position:\n\n";
 
-    for (int i=0; i<=7; i++){
-        for (int j=0; j<=7; j++){
+    for(int row = 7; row >= 0; row--){   // 8 → 1
 
-            int index = i*8+j;
+        cout << row + 1 << "   ";        // Rank label
+
+        for(int col = 0; col < 8; col++){
+
+            int index = row * 8 + col;
             int piece = board.get_piece(index);
 
-            if (piece>0){
-               //white:
-               if (piece==1) printf("WR     ");
-               if (piece==2) printf("WN     ");
-               if (piece==3) printf("WB     ");
-               if (piece==4) printf("WK     ");
-               if (piece==5) printf("WQ     ");
-               if (piece==6) printf("WP     ");
-            }
-
-            else if (piece<0){
-                //black:
-               if (piece==-1) printf("BR     ");
-               if (piece==-2) printf("BN     ");
-               if (piece==-3) printf("BB     ");
-               if (piece==-4) printf("BK     ");
-               if (piece==-5) printf("BQ     ");
-               if (piece==-6) printf("BP     ");
-
-            }
-
-            else{
-                printf("_      ");
-            }
-
+            print_piece(piece);
+            cout << "   ";
         }
-        cout<<endl;
+
+        cout << endl << endl;
     }
 
+    cout << "    A   B   C   D   E   F   G   H\n\n";
 }
+
 
 void Printer::print_piece(int piece){
 
-    cout<<"Piece is: ";
-    if (piece>0){
-            //white:
-           if (piece==1) printf("WR     ");
-           if (piece==2) printf("WN     ");
-           if (piece==3) printf("WB     ");
-           if (piece==4) printf("WK     ");
-           if (piece==5) printf("WQ     ");
-           if (piece==6) printf("WP     ");
-        }
+    if(piece == 0){
+        cout << ".";
+        return;
+    }
 
+    if(piece > 0){
+        if(piece == 1) cout << "WR";
+        if(piece == 2) cout << "WN";
+        if(piece == 3) cout << "WB";
+        if(piece == 4) cout << "WK";
+        if(piece == 5) cout << "WQ";
+        if(piece == 6) cout << "WP";
+    }
     else{
-            //black:
-           if (piece==-1) printf("BR     ");
-           if (piece==-2) printf("BN     ");
-           if (piece==-3) printf("BB     ");
-           if (piece==-4) printf("BK     ");
-           if (piece==-5) printf("BQ     ");
-           if (piece==-6) printf("BP     ");
-
-        }
-
+        if(piece == -1) cout << "BR";
+        if(piece == -2) cout << "BN";
+        if(piece == -3) cout << "BB";
+        if(piece == -4) cout << "BK";
+        if(piece == -5) cout << "BQ";
+        if(piece == -6) cout << "BP";
+    }
 }

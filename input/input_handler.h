@@ -8,6 +8,8 @@ class input_handler {
 
 public:
     Move get_move_from_user(Board &board);
+    int notation_to_index(string notation);
+
 };
 
 #endif

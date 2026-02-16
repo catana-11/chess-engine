@@ -383,3 +383,4 @@ void move_generator::generate_king_moves(Board &board, int pos, bool white_turn,
             }
             else continue;
 }
+}
