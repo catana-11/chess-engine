@@ -66,3 +66,8 @@ void Board::make_move(int from_index, int to_index){
             board[from_index] = 0;
         }
 
+void Board::undo_move(int from_index, int to_index, int captured_piece){
+    board[from_index] = board[to_index];
+    board[to_index] = captured_piece;
+}
+

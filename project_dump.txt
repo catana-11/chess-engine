@@ -1,0 +1,936 @@
+
+====================
+FILE: main.cpp
+====================
+#include "board/Board.h"
+#include "display/Printer.h"
+#include "input/input_handler.h"
+#include "moves/move_generator.h"
+#include <iostream>
+
+using namespace std;
+
+int main(){
+
+    Board B;
+    Printer P;
+    input_handler input;
+    move_generator generator;
+
+    bool whiteTurn = true;
+
+    while(true){
+
+        P.print_board(B);
+
+        vector<Move> legalMoves = generator.generate_all_moves(B, whiteTurn);
+
+        cout << "\nAvailable moves: " << legalMoves.size() << endl;
+
+        if(whiteTurn)
+            cout << "White's turn\n";
+        else
+            cout << "Black's turn\n";
+
+        Move move = input.get_move_from_user(B);
+
+        B.make_move(move.from, move.to);
+
+        whiteTurn = !whiteTurn;
+    }
+
+    return 0;
+}
+
+
+====================
+FILE: prims.cpp
+====================
+#include <iostream>
+using namespace std;
+
+
+class prims {
+    int graph[10][10];
+    int n;
+
+public:
+    prims() {
+        cout << "Enter number of offices (vertices): ";
+        cin >> n;
+
+        // initialize graph with 999
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                graph[i][j] = 999;
+            }
+        }
+    }
+
+    void create() {
+        int edges;
+        cout << "Enter number of connections (edges): ";
+        cin >> edges;
+
+        cout << "Enter (source destination cost):\n";
+        for(int i = 0; i < edges; i++){
+            int u, v, w;
+            cin >> u >> v >> w;
+
+            graph[u][v] = w;
+            graph[v][u] = w; // undirected graph
+        }
+    }
+
+    void display() {
+        cout << "\nCost Matrix:\n";
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                if(graph[i][j] == 999)
+                    cout << "999 ";
+                else
+                    cout << graph[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    void prims_algorithm(int start) {
+
+        int nearest[20];
+        int mincost = 0;
+
+        // initialize nearest array
+        nearest[start] = -1;
+
+        for(int i = 0; i < n; i++){
+            if(i != start)
+                nearest[i] = start;
+        }
+
+        cout << "\nEdges in Minimum Spanning Tree:\n";
+
+        int count = 1;
+
+        while(count < n){
+
+            int min = 999;
+            int j = -1;
+
+            // find minimum edge
+            for(int i = 0; i < n; i++){
+                if(nearest[i] != -1 && graph[nearest[i]][i] < min){
+                    min = graph[nearest[i]][i];
+                    j = i;
+                }
+            }
+
+            if(j == -1){
+                cout << "No spanning tree exists\n";
+                return;
+            }
+
+            int u = nearest[j];
+            int v = j;
+
+            cout << u << " --> " << v << " = " << min << endl;
+
+            mincost += min;
+            nearest[j] = -1;
+
+            // update nearest values
+            for(int k = 0; k < n; k++){
+                if(nearest[k] != -1 && graph[j][k] < graph[nearest[k]][k]){
+                    nearest[k] = j;
+                }
+            }
+
+            count++;
+        }
+
+        cout << "\nMinimum Total Cost = " << mincost << endl;
+    }
+};
+
+int main(){
+
+    prims p;
+
+    p.create();
+    p.display();
+
+    int start;
+    cout << "\nEnter starting vertex: ";
+    cin >> start;
+
+    p.prims_algorithm(start);
+
+    return 0;
+}
+
+
+====================
+FILE: README.md
+====================
+
+
+====================
+FILE: temp.cpp
+====================
+// bishop moves generator
+
+#include <iostream>
+using namespace std;
+
+
+int main(){
+
+    int arr[50] = {0};
+    int j = 0;
+
+    // moves ahead formula: +-8 +- 1(i)
+    for(int i=0; i<7;i++){
+        arr[j] = 8+1*i;
+        j+=1;
+    }
+
+    for(int i=0; i<7;i++){
+        arr[j] = 8-1*i;
+        j+=1;
+    }
+
+    for(int i=0; i<7;i++){
+        arr[j] = -8+1*i;
+        j+=1;
+    }
+
+    for(int i=0; i<7;i++){
+        arr[j] = -8-1*i;
+        j+=1;
+    }
+
+    for (int i = 0; i<50; i++){
+        cout<<arr[i]<<endl;
+    }
+
+
+
+    return 0;
+}
+
+====================
+FILE: ai\engine.cpp
+====================
+
+
+====================
+FILE: ai\engine.h
+====================
+
+
+====================
+FILE: board\Board.cpp
+====================
+#include "Board.h"
+#include <iostream>
+//Board.cpp
+
+using namespace std;
+
+Board::Board(){
+            // ye constructor board pe pieces set karega
+            for (int i=0; i<64; i++){ board[i] = 0;}
+
+            /*
+            should be like:
+            ...
+            WP  WP...
+            8   9   10  11  12  13  14  15
+            WR  WN  WB  WK  WQ  WB  WN  WR
+            0   1   2   3   4   5   6   7  --> white king row
+            */
+
+            // white side-->
+            board[0] = 1; // white rook WR at A1
+            board[1] = 2; // white knight WN at B1
+            board[2] = 3; // white bishop WB at C1
+            board[3] = 4; // white king WK at D1
+            board[4] = 5; // white queen
+            board[5] = 3; // bishop again
+            board[6] = 2; board[7] = 1;
+
+            board[8] = 6; // 6 for white pawns
+            board[9] = 6; 
+            board[10] = 6; 
+            board[11] = 6; 
+            board[12] = 6;
+            board[13] = 6; 
+            board[14] = 6; board[15] = 6;
+
+
+            // black side -->
+            board[56] = -1; // black rook BR at A8
+            board[57] = -2; // black knight WN at B8
+            board[58] = -3; // black bishop WB at C8
+            board[59] = -4; // black king WK at D8
+            board[60] = -5; // black queen
+            board[61] = -3; // bishop again
+            board[62] = -2; board[63] = -1;
+
+            board[48] = -6; // -6 for blk pawns
+            board[49] = -6; 
+            board[50] = -6; 
+            board[51] = -6; 
+            board[52] = -6;
+            board[53] = -6; 
+            board[54] = -6; board[55] = -6;
+        }
+
+int Board::get_piece(int index){
+            return board[index];
+        }
+
+void Board::set_piece(int index, int val){
+            board[index]=val;
+        }
+
+void Board::make_move(int from_index, int to_index){
+            board[to_index] = board[from_index];
+            board[from_index] = 0;
+        }
+
+
+
+====================
+FILE: board\Board.h
+====================
+
+// this should have: the board, initialise it, get and set pieces, make move
+//Board.h
+#ifndef BOARD_H
+#define BOARD_H
+
+#include <iostream>
+using namespace std;
+
+class Board{
+
+    int board[64];
+
+    public:
+
+        Board();
+
+        int get_piece(int index);
+        void set_piece(int index, int val);
+        void make_move(int from_index, int to_index);
+
+
+};
+
+#endif
+
+====================
+FILE: display\printer.cpp
+====================
+#include "Printer.h"
+#include <iostream>
+#include "../board/Board.h"
+#include <string>
+//printer.cpp
+
+using namespace std;
+
+void Printer::print_board(Board &board){
+
+    cout << "\nCurrent Board Position:\n\n";
+
+    for(int row = 7; row >= 0; row--){   // 8 → 1
+
+        cout << row + 1 << "   ";        // Rank label
+
+        for(int col = 0; col < 8; col++){
+
+            int index = row * 8 + col;
+            int piece = board.get_piece(index);
+
+            print_piece(piece);
+            cout << "   ";
+        }
+
+        cout << endl << endl;
+    }
+
+    cout << "    A   B   C   D   E   F   G   H\n\n";
+}
+
+
+void Printer::print_piece(int piece){
+
+    if(piece == 0){
+        cout << ".";
+        return;
+    }
+
+    if(piece > 0){
+        if(piece == 1) cout << "WR";
+        if(piece == 2) cout << "WN";
+        if(piece == 3) cout << "WB";
+        if(piece == 4) cout << "WK";
+        if(piece == 5) cout << "WQ";
+        if(piece == 6) cout << "WP";
+    }
+    else{
+        if(piece == -1) cout << "BR";
+        if(piece == -2) cout << "BN";
+        if(piece == -3) cout << "BB";
+        if(piece == -4) cout << "BK";
+        if(piece == -5) cout << "BQ";
+        if(piece == -6) cout << "BP";
+    }
+}
+
+
+====================
+FILE: display\Printer.h
+====================
+
+// this should print the current board situation pretty way
+#include "../board/Board.h"
+//printer.h
+
+class Printer{
+
+    public:
+
+        void print_board(Board &board);
+
+        void print_piece(int piece);
+
+};
+
+====================
+FILE: eval\eval.cpp
+====================
+
+
+====================
+FILE: eval\eval.h
+====================
+
+
+====================
+FILE: game\game.cpp
+====================
+
+
+====================
+FILE: game\game.h
+====================
+
+
+====================
+FILE: input\input_handler.cpp
+====================
+#include "input_handler.h"
+#include <iostream>
+
+using namespace std;
+
+Move input_handler::get_move_from_user(Board &board){
+
+    string from, to;
+
+    cout << "Enter move (example: e2 e4): ";
+    cin >> from >> to;
+
+    int fromIndex = notation_to_index(from);
+    int toIndex   = notation_to_index(to);
+
+    Move move;
+    move.from = fromIndex;
+    move.to   = toIndex;
+    move.captured_piece = board.get_piece(toIndex);
+
+    return move;
+}
+
+
+int input_handler::notation_to_index(string notation){
+
+    char fileChar = notation[0];   // e.g. 'E'
+    char rankChar = notation[1];   // e.g. '2'
+
+    int file = fileChar - 'a';     // 'a' → 0, 'b' → 1 ...
+    int rank = rankChar - '1';     // '1' → 0, '2' → 1 ...
+
+    return rank * 8 + file;
+}
+
+
+====================
+FILE: input\input_handler.h
+====================
+#ifndef INPUT_HANDLER_H
+#define INPUT_HANDLER_H
+
+#include "../moves/Move.h"   
+#include "../board/Board.h"
+
+class input_handler {
+
+public:
+    Move get_move_from_user(Board &board);
+    int notation_to_index(string notation);
+
+};
+
+#endif
+
+
+====================
+FILE: moves\move.h
+====================
+#ifndef MOVE_H
+#define MOVE_H
+
+struct Move {
+    int from;
+    int to;
+    int captured_piece;
+};
+
+#endif
+
+
+====================
+FILE: moves\move_generator.cpp
+====================
+#include "move_generator.h"
+
+bool move_generator::is_white_piece(int p){return p > 0;}
+
+bool move_generator::is_black_piece(int p){return p < 0;}
+
+vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
+
+    vector<Move> moves;
+
+    for(int i=0;i<64;i++){
+
+        int piece = board.get_piece(i); // gets the piece id on that square
+
+        if(piece == 0) continue;
+
+        if(white_turn && !is_white_piece(piece)) continue;
+        if(!white_turn && !is_black_piece(piece)) continue;
+
+        int absPiece = abs(piece);
+
+        if(absPiece == 6)  // pawn 
+            generate_pawn_moves(board,i,white_turn,moves);
+
+        else if(absPiece == 1) // rook
+            generate_rook_moves(board,i,white_turn,moves);
+
+        else if(absPiece == 2) // knight
+            generate_knight_moves(board,i,white_turn,moves);
+
+        else if(absPiece == 3) // bishop
+            generate_bishop_moves(board, i, white_turn, moves);
+
+        else if(absPiece == 4)
+            generate_king_moves(board, i, white_turn, moves);
+
+        else if(absPiece == 5)
+            generate_queen_moves(board, i, white_turn, moves);
+    }
+
+    return moves;
+}
+
+//////////////////////// PAWN ////////////////////////
+
+void move_generator::generate_pawn_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int dir = white_turn ? 8 : -8; // white pawn goes front => +8
+
+    int forward = pos + dir; 
+
+    if(forward >=0 && forward <64 && board.get_piece(forward)==0){
+        moves.push_back({pos, forward, 0});  // from, to, captured_piece
+    }
+    // if forward is empty i.e ==0 , only then pawn going ahead is valid
+
+    // now lets c diagonal capturing
+    int diag1 = pos + dir + 1;
+    int diag2 = pos + dir - 1;
+
+
+    // checks to avoid wrap arounds
+    int new_row = diag1/8; int new_col = diag1%8;
+    int old_row = pos/8; int old_col = pos%8;
+
+    if(diag1>=0 && diag1<64){
+
+        if (abs(new_col - old_col)==1){
+            int target = board.get_piece(diag1); // whats on diag1
+            if(white_turn && is_black_piece(target)) // if it is enemy piece
+                moves.push_back({pos,diag1,target}); // capturing is possible
+            if(!white_turn && is_white_piece(target)) 
+                moves.push_back({pos,diag1,target});
+        }
+    }
+
+    // repeat
+    new_row = diag2/8; new_col = diag2%8;
+    old_row = pos/8; old_col = pos%8;
+
+    if(diag2>=0 && diag2<64){
+        if (abs(new_col - old_col)==1){
+            int target = board.get_piece(diag2);
+            if(white_turn && is_black_piece(target))
+                moves.push_back({pos,diag2,target});
+            if(!white_turn && is_white_piece(target))
+                moves.push_back({pos,diag2,target});
+        }
+    }
+}
+
+//////////////////////// ROOK ////////////////////////
+
+void move_generator::generate_rook_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int directions[4] = {8,-8,1,-1}; // upar, niche, right, left
+
+    for(int d=0; d<4; d++){ // try sliding in each direction one by one
+
+        int cur = pos;
+        int prev = pos;
+
+        while(true){
+
+            cur += directions[d];
+
+            if(cur <0 || cur>=64) break;
+
+            int old_row = prev/8; int old_col = prev%8;
+            int new_row = cur/8; int new_col = cur%8;
+
+            // rook moves horizontally and checking if we accidently exceed previous row
+            if ((abs(directions[d])==1 && new_row==old_row)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+
+            // same for vertical
+            else if ((abs(directions[d])==8 && new_col == old_col)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+            else break;
+
+            prev = cur;
+        } // while will keep appending moves in that direction
+    }
+}
+
+//////////////////////// KNIGHT ////////////////////////
+
+void move_generator::generate_knight_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int jumps[8] = {15,17,6,10,-15,-17,-6,-10}; // ideal case => 8 moves possible
+
+    for(int i=0;i<8;i++){
+
+        int to = pos + jumps[i]; // try each jump
+
+        if(to<0 || to>=64) continue; 
+
+        int new_row = to/8; int new_col = to%8;
+        int old_row = pos/8; int old_col = pos%8;
+
+        if ((abs(new_row - old_row) == 2 && abs(new_col - old_col) == 1) || (abs(new_row - old_row) == 1 && abs(new_col - old_col) == 2)){
+
+            int piece = board.get_piece(to);
+
+            if(piece==0){
+                moves.push_back({pos,to,0});
+            }
+            else{
+                if(white_turn && is_black_piece(piece))
+                    moves.push_back({pos,to,piece});
+                if(!white_turn && is_white_piece(piece))
+                    moves.push_back({pos,to,piece});
+            }
+        }
+    }
+}
+
+
+//////////////////////// BISHOP ////////////////////////
+void move_generator::generate_bishop_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int directions[4] = {+7,+9,-7,-9}; 
+
+    for(int d=0; d<4; d++){ // try sliding in each direction one by one
+
+        int cur = pos;
+        int prev = pos;
+
+        while(true){
+
+            cur += directions[d];
+
+            if(cur <0 || cur>=64) break;
+            
+            int new_row = cur/8; int new_col = cur%8;
+            int old_row = prev/8; int old_col = prev%8;
+
+            if (abs(new_row-old_row)==1 && abs(new_col-old_col)==1){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+            else break;
+            prev = cur;
+        } // while will keep appending moves in that direction
+    }
+}
+
+//////////////////////// QUEEN ////////////////////////
+void move_generator::generate_queen_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int directions[8] = {+7,+9,-7,-9, 8,-8,1,-1}; 
+
+    for(int d=0; d<8; d++){ // try sliding in each direction one by one
+
+        int cur = pos;
+        int prev = pos;
+
+        while(true){
+
+            cur += directions[d];
+
+            if(cur <0 || cur>=64) break;
+            
+            int new_row = cur/8; int new_col = cur%8;
+            int old_row = prev/8; int old_col = prev%8;
+
+            // if diagonal movement:
+            if (abs(new_row-old_row)==1 && abs(new_col-old_col)==1){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+
+            // if horizontal movement:
+            else if ((abs(directions[d])==1 && new_row==old_row)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+
+            // same for vertical
+            else if ((abs(directions[d])==8 && new_col == old_col)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    break; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+            else break;
+            prev = cur;
+        } // while will keep appending moves in that direction
+    }
+}
+
+//////////////////////// KING ////////////////////////
+
+void move_generator::generate_king_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
+
+    int jumps[8] = {-1, +1, +8, -8, +7, -7, +9, -9}; 
+
+    for(int i=0;i<8;i++){
+
+        int cur = pos + jumps[i]; // try each jump
+        int prev = pos;
+
+        if(cur<0 ||cur>=64) continue; 
+
+            int new_row = cur/8; int new_col = cur%8;
+            int old_row = prev/8; int old_col = prev%8;
+
+            // if diagonal movement:
+            if (abs(new_row-old_row)==1 && abs(new_col-old_col)==1){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    continue; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+
+            // if horizontal movement:
+            else if ((abs(jumps[i])==1 && new_row==old_row)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    continue; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+
+            // same for vertical
+            else if ((abs(jumps[i])==8 && new_col == old_col)){
+
+                int piece = board.get_piece(cur);
+
+                if(piece == 0){
+                    moves.push_back({pos,cur,0}); // empty square, can go ahead
+                }
+                else{
+                    if(white_turn && is_black_piece(piece))
+                        moves.push_back({pos,cur,piece}); // capture
+
+                    if(!white_turn && is_white_piece(piece)) //capture
+                        moves.push_back({pos,cur,piece});
+
+                    continue; // if my own piece, then that direction is blocked, so break 
+                }
+            }
+            else continue;
+}
+}
+
+====================
+FILE: moves\move_generator.h
+====================
+#ifndef MOVE_GENERATOR_H
+#define MOVE_GENERATOR_H
+
+#include <vector>
+#include "../board/Board.h"
+#include "Move.h"
+
+using std::vector;
+
+class move_generator {
+
+public:
+    vector<Move> generate_all_moves(Board &board, bool whiteTurn);
+
+private:
+    void generate_pawn_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+    void generate_rook_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+    void generate_knight_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+    void generate_bishop_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+    void generate_queen_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+    void generate_king_moves(Board &board, int pos, bool whiteTurn, vector<Move> &moves);
+
+    bool is_white_piece(int piece);
+    bool is_black_piece(int piece);
+};
+
+#endif
+
+
+====================
+FILE: rules\rules.cpp
+====================
+
+
+====================
+FILE: rules\rules.h
+====================
+

@@ -2,6 +2,7 @@
 #include "display/Printer.h"
 #include "input/input_handler.h"
 #include "moves/move_generator.h"
+#include "rules/rules.h"
 #include <iostream>
 
 using namespace std;
@@ -12,6 +13,7 @@ int main(){
     Printer P;
     input_handler input;
     move_generator generator;
+    rules rule_engine;
 
     bool whiteTurn = true;
 
@@ -19,7 +21,10 @@ int main(){
 
         P.print_board(B);
 
-        vector<Move> legalMoves = generator.generate_all_moves(B, whiteTurn);
+        vector<Move> pseudoMoves = generator.generate_all_moves(B, whiteTurn);
+
+        vector<Move> legalMoves =
+            rule_engine.filter_legal_moves(B, pseudoMoves, whiteTurn);
 
         cout << "\nAvailable moves: " << legalMoves.size() << endl;
 
@@ -28,7 +33,26 @@ int main(){
         else
             cout << "Black's turn\n";
 
-        Move move = input.get_move_from_user(B);
+        Move move;
+
+        bool validMove = false;
+
+        while(!validMove){
+
+            move = input.get_move_from_user(B);
+
+            for(auto &m : legalMoves){
+
+                if(m.from == move.from && m.to == move.to){
+                    validMove = true;
+                    break;
+                }
+            }
+
+            if(!validMove){
+                cout << "Illegal move! Try again.\n";
+            }
+        }
 
         B.make_move(move.from, move.to);
 

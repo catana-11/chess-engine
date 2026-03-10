@@ -18,6 +18,7 @@ class Board{
         int get_piece(int index);
         void set_piece(int index, int val);
         void make_move(int from_index, int to_index);
+        void undo_move(int from_index, int to_index, int captured_piece);
 
 
 };

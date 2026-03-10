@@ -45,46 +45,67 @@ vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
 
 void move_generator::generate_pawn_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
 
-    int dir = white_turn ? 8 : -8; // white pawn goes front => +8
+    int dir = white_turn ? 8 : -8; 
 
-    int forward = pos + dir; 
+    int forward = pos + dir;
 
-    if(forward >=0 && forward <64 && board.get_piece(forward)==0){
-        moves.push_back({pos, forward, 0});  // from, to, captured_piece
-    }
-    // if forward is empty i.e ==0 , only then pawn going ahead is valid
+    // single forward move
+    if(forward >= 0 && forward < 64 && board.get_piece(forward) == 0){
 
-    // now lets c diagonal capturing
-    int diag1 = pos + dir + 1;
-    int diag2 = pos + dir - 1;
+        moves.push_back({pos, forward, 0});
 
+        // double forwarding
+        int start_rank = white_turn ? 1 : 6;
+        int row = pos / 8;
 
-    // checks to avoid wrap arounds
-    int new_row = diag1/8; int new_col = diag1%8;
-    int old_row = pos/8; int old_col = pos%8;
+        int double_forward = pos + 2*dir;
 
-    if(diag1>=0 && diag1<64){
+        if(row == start_rank &&
+           double_forward >= 0 && double_forward < 64 &&
+           board.get_piece(double_forward) == 0){
 
-        if (abs(new_col - old_col)==1){
-            int target = board.get_piece(diag1); // whats on diag1
-            if(white_turn && is_black_piece(target)) // if it is enemy piece
-                moves.push_back({pos,diag1,target}); // capturing is possible
-            if(!white_turn && is_white_piece(target)) 
-                moves.push_back({pos,diag1,target});
+            moves.push_back({pos, double_forward, 0});
         }
     }
 
-    // repeat
-    new_row = diag2/8; new_col = diag2%8;
-    old_row = pos/8; old_col = pos%8;
+    // diagonal capture squares
+    int diag1 = pos + dir + 1;
+    int diag2 = pos + dir - 1;
 
-    if(diag2>=0 && diag2<64){
-        if (abs(new_col - old_col)==1){
-            int target = board.get_piece(diag2);
+    int old_row = pos / 8;
+    int old_col = pos % 8;
+
+    // capture right
+    if(diag1 >= 0 && diag1 < 64){
+
+        int new_col = diag1 % 8;
+
+        if(abs(new_col - old_col) == 1){
+
+            int target = board.get_piece(diag1);
+
             if(white_turn && is_black_piece(target))
-                moves.push_back({pos,diag2,target});
+                moves.push_back({pos, diag1, target});
+
             if(!white_turn && is_white_piece(target))
-                moves.push_back({pos,diag2,target});
+                moves.push_back({pos, diag1, target});
+        }
+    }
+
+    // capture left
+    if(diag2 >= 0 && diag2 < 64){
+
+        int new_col = diag2 % 8;
+
+        if(abs(new_col - old_col) == 1){
+
+            int target = board.get_piece(diag2);
+
+            if(white_turn && is_black_piece(target))
+                moves.push_back({pos, diag2, target});
+
+            if(!white_turn && is_white_piece(target))
+                moves.push_back({pos, diag2, target});
         }
     }
 }

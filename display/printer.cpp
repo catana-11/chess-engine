@@ -8,11 +8,13 @@ using namespace std;
 
 void Printer::print_board(Board &board){
 
-    cout << "\nCurrent Board Position:\n\n";
+    cout << "\n    A   B   C   D   E   F   G   H\n";
 
-    for(int row = 7; row >= 0; row--){   // 8 → 1
+    for(int row = 7; row >= 0; row--){
 
-        cout << row + 1 << "   ";        // Rank label
+        cout << "  +---+---+---+---+---+---+---+---+\n";
+
+        cout << row+1 << " |";
 
         for(int col = 0; col < 8; col++){
 
@@ -20,37 +22,39 @@ void Printer::print_board(Board &board){
             int piece = board.get_piece(index);
 
             print_piece(piece);
-            cout << "   ";
+
+            cout << "|";
         }
 
-        cout << endl << endl;
+        cout << " " << row+1 << endl;
     }
+
+    cout << "  +---+---+---+---+---+---+---+---+\n";
 
     cout << "    A   B   C   D   E   F   G   H\n\n";
 }
 
-
 void Printer::print_piece(int piece){
 
     if(piece == 0){
-        cout << ".";
+        cout << " . ";
         return;
     }
 
     if(piece > 0){
-        if(piece == 1) cout << "WR";
-        if(piece == 2) cout << "WN";
-        if(piece == 3) cout << "WB";
-        if(piece == 4) cout << "WK";
-        if(piece == 5) cout << "WQ";
-        if(piece == 6) cout << "WP";
+        if(piece == 1) cout << "WR ";
+        if(piece == 2) cout << "WN ";
+        if(piece == 3) cout << "WB ";
+        if(piece == 4) cout << "WK ";
+        if(piece == 5) cout << "WQ ";
+        if(piece == 6) cout << "WP ";
     }
     else{
-        if(piece == -1) cout << "BR";
-        if(piece == -2) cout << "BN";
-        if(piece == -3) cout << "BB";
-        if(piece == -4) cout << "BK";
-        if(piece == -5) cout << "BQ";
-        if(piece == -6) cout << "BP";
+        if(piece == -1) cout << "BR ";
+        if(piece == -2) cout << "BN ";
+        if(piece == -3) cout << "BB ";
+        if(piece == -4) cout << "BK ";
+        if(piece == -5) cout << "BQ ";
+        if(piece == -6) cout << "BP ";
     }
 }

@@ -7,18 +7,26 @@ Move input_handler::get_move_from_user(Board &board){
 
     string from, to;
 
-    cout << "Enter move (example: e2 e4): ";
-    cin >> from >> to;
+    while(true){
 
-    int fromIndex = notation_to_index(from);
-    int toIndex   = notation_to_index(to);
+        cout << "Enter move (example: e2 e4): ";
+        cin >> from >> to;
 
-    Move move;
-    move.from = fromIndex;
-    move.to   = toIndex;
-    move.captured_piece = board.get_piece(toIndex);
+        if(from.length() != 2 || to.length() != 2){
+            cout << "Invalid format! Use: e2 e4\n";
+            continue;
+        }
 
-    return move;
+        int fromIndex = notation_to_index(from);
+        int toIndex   = notation_to_index(to);
+
+        Move move;
+        move.from = fromIndex;
+        move.to   = toIndex;
+        move.captured_piece = board.get_piece(toIndex);
+
+        return move;
+    }
 }
 
 
