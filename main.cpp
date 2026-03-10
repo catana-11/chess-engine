@@ -26,6 +26,23 @@ int main(){
         vector<Move> legalMoves =
             rule_engine.filter_legal_moves(B, pseudoMoves, whiteTurn);
 
+        if(legalMoves.size() == 0){
+
+            if(rule_engine.is_king_in_check(B, whiteTurn)){
+                cout << "\nCHECKMATE!\n";
+
+                if(whiteTurn)
+                    cout << "Black wins!\n";
+                else
+                    cout << "White wins!\n";
+            }
+            else{
+                cout << "\nSTALEMATE!\n";
+            }
+
+            break;
+        }
+
         cout << "\nAvailable moves: " << legalMoves.size() << endl;
 
         if(whiteTurn)
@@ -55,6 +72,9 @@ int main(){
         }
 
         B.make_move(move.from, move.to);
+
+        bool opponentInCheck = rule_engine.is_king_in_check(B, !whiteTurn);
+        if(opponentInCheck){cout << "\nCHECK!\n";}
 
         whiteTurn = !whiteTurn;
     }

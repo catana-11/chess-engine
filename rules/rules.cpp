@@ -32,12 +32,12 @@ bool rules::is_king_in_check(Board &board, bool whiteKing){
 
         int piece = board.get_piece(i);
 
-        if(whiteKing && piece == 4){
+        if(whiteKing && piece == 5){
             kingSquare = i;
             break;
         }
 
-        if(!whiteKing && piece == -4){
+        if(!whiteKing && piece == -5){
             kingSquare = i;
             break;
         }

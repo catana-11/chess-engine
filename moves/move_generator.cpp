@@ -31,10 +31,10 @@ vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
         else if(absPiece == 3) // bishop
             generate_bishop_moves(board, i, white_turn, moves);
 
-        else if(absPiece == 4)
+        else if(absPiece == 5)
             generate_king_moves(board, i, white_turn, moves);
 
-        else if(absPiece == 5)
+        else if(absPiece == 4)
             generate_queen_moves(board, i, white_turn, moves);
     }
 

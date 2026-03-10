@@ -21,8 +21,8 @@ Board::Board(){
             board[0] = 1; // white rook WR at A1
             board[1] = 2; // white knight WN at B1
             board[2] = 3; // white bishop WB at C1
-            board[3] = 4; // white king WK at D1
-            board[4] = 5; // white queen
+            board[3] = 4; // white queen WQ at D1
+            board[4] = 5; // white king
             board[5] = 3; // bishop again
             board[6] = 2; board[7] = 1;
 
@@ -39,8 +39,8 @@ Board::Board(){
             board[56] = -1; // black rook BR at A8
             board[57] = -2; // black knight WN at B8
             board[58] = -3; // black bishop WB at C8
-            board[59] = -4; // black king WK at D8
-            board[60] = -5; // black queen
+            board[59] = -4; // black queen WQ at D8
+            board[60] = -5; // black king
             board[61] = -3; // bishop again
             board[62] = -2; board[63] = -1;
 

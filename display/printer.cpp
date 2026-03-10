@@ -45,16 +45,16 @@ void Printer::print_piece(int piece){
         if(piece == 1) cout << "WR ";
         if(piece == 2) cout << "WN ";
         if(piece == 3) cout << "WB ";
-        if(piece == 4) cout << "WK ";
-        if(piece == 5) cout << "WQ ";
+        if(piece == 4) cout << "WQ ";
+        if(piece == 5) cout << "WK ";
         if(piece == 6) cout << "WP ";
     }
     else{
         if(piece == -1) cout << "BR ";
         if(piece == -2) cout << "BN ";
         if(piece == -3) cout << "BB ";
-        if(piece == -4) cout << "BK ";
-        if(piece == -5) cout << "BQ ";
+        if(piece == -4) cout << "BQ ";
+        if(piece == -5) cout << "BK ";
         if(piece == -6) cout << "BP ";
     }
 }
