@@ -3,6 +3,7 @@
 #include "input/input_handler.h"
 #include "moves/move_generator.h"
 #include "rules/rules.h"
+#include "ai/engine.h"
 #include <iostream>
 
 using namespace std;
@@ -14,6 +15,8 @@ int main(){
     input_handler input;
     move_generator generator;
     rules rule_engine;
+
+    engine ai;
 
     bool whiteTurn = true;
 
@@ -50,28 +53,42 @@ int main(){
         else
             cout << "Black's turn\n";
 
-        Move move;
+        if(whiteTurn){
 
-        bool validMove = false;
+            // HUMAN (WHITE)
+            Move move;
+            bool validMove = false;
 
-        while(!validMove){
+            while(!validMove){
 
-            move = input.get_move_from_user(B);
+                move = input.get_move_from_user(B);
 
-            for(auto &m : legalMoves){
+                for(auto &m : legalMoves){
+                    if(m.from == move.from && m.to == move.to){
+                        validMove = true;
+                        break;
+                    }
+                }
 
-                if(m.from == move.from && m.to == move.to){
-                    validMove = true;
-                    break;
+                if(!validMove){
+                    cout << "Illegal move! Try again.\n";
                 }
             }
 
-            if(!validMove){
-                cout << "Illegal move! Try again.\n";
-            }
+            B.make_move(move.from, move.to);
         }
+        else{
 
-        B.make_move(move.from, move.to);
+            // AI (BLACK)
+            cout << "\nAI thinking...\n";
+
+            Move bestMove = ai.find_best_move(B, whiteTurn, 3);
+
+            cout << "AI played: "
+                << bestMove.from << " -> " << bestMove.to << endl;
+
+            B.make_move(bestMove.from, bestMove.to);
+        }
 
         bool opponentInCheck = rule_engine.is_king_in_check(B, !whiteTurn);
         if(opponentInCheck){cout << "\nCHECK!\n";}

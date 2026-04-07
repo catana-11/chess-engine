@@ -6,6 +6,8 @@ FILE: main.cpp
 #include "display/Printer.h"
 #include "input/input_handler.h"
 #include "moves/move_generator.h"
+#include "rules/rules.h"
+#include "ai/engine.h"
 #include <iostream>
 
 using namespace std;
@@ -16,6 +18,9 @@ int main(){
     Printer P;
     input_handler input;
     move_generator generator;
+    rules rule_engine;
+
+    engine ai;
 
     bool whiteTurn = true;
 
@@ -23,7 +28,27 @@ int main(){
 
         P.print_board(B);
 
-        vector<Move> legalMoves = generator.generate_all_moves(B, whiteTurn);
+        vector<Move> pseudoMoves = generator.generate_all_moves(B, whiteTurn);
+
+        vector<Move> legalMoves =
+            rule_engine.filter_legal_moves(B, pseudoMoves, whiteTurn);
+
+        if(legalMoves.size() == 0){
+
+            if(rule_engine.is_king_in_check(B, whiteTurn)){
+                cout << "\nCHECKMATE!\n";
+
+                if(whiteTurn)
+                    cout << "Black wins!\n";
+                else
+                    cout << "White wins!\n";
+            }
+            else{
+                cout << "\nSTALEMATE!\n";
+            }
+
+            break;
+        }
 
         cout << "\nAvailable moves: " << legalMoves.size() << endl;
 
@@ -32,138 +57,34 @@ int main(){
         else
             cout << "Black's turn\n";
 
-        Move move = input.get_move_from_user(B);
+        Move move;
+
+        bool validMove = false;
+
+        while(!validMove){
+
+            move = input.get_move_from_user(B);
+
+            for(auto &m : legalMoves){
+
+                if(m.from == move.from && m.to == move.to){
+                    validMove = true;
+                    break;
+                }
+            }
+
+            if(!validMove){
+                cout << "Illegal move! Try again.\n";
+            }
+        }
 
         B.make_move(move.from, move.to);
 
+        bool opponentInCheck = rule_engine.is_king_in_check(B, !whiteTurn);
+        if(opponentInCheck){cout << "\nCHECK!\n";}
+
         whiteTurn = !whiteTurn;
     }
-
-    return 0;
-}
-
-
-====================
-FILE: prims.cpp
-====================
-#include <iostream>
-using namespace std;
-
-
-class prims {
-    int graph[10][10];
-    int n;
-
-public:
-    prims() {
-        cout << "Enter number of offices (vertices): ";
-        cin >> n;
-
-        // initialize graph with 999
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                graph[i][j] = 999;
-            }
-        }
-    }
-
-    void create() {
-        int edges;
-        cout << "Enter number of connections (edges): ";
-        cin >> edges;
-
-        cout << "Enter (source destination cost):\n";
-        for(int i = 0; i < edges; i++){
-            int u, v, w;
-            cin >> u >> v >> w;
-
-            graph[u][v] = w;
-            graph[v][u] = w; // undirected graph
-        }
-    }
-
-    void display() {
-        cout << "\nCost Matrix:\n";
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                if(graph[i][j] == 999)
-                    cout << "999 ";
-                else
-                    cout << graph[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
-
-    void prims_algorithm(int start) {
-
-        int nearest[20];
-        int mincost = 0;
-
-        // initialize nearest array
-        nearest[start] = -1;
-
-        for(int i = 0; i < n; i++){
-            if(i != start)
-                nearest[i] = start;
-        }
-
-        cout << "\nEdges in Minimum Spanning Tree:\n";
-
-        int count = 1;
-
-        while(count < n){
-
-            int min = 999;
-            int j = -1;
-
-            // find minimum edge
-            for(int i = 0; i < n; i++){
-                if(nearest[i] != -1 && graph[nearest[i]][i] < min){
-                    min = graph[nearest[i]][i];
-                    j = i;
-                }
-            }
-
-            if(j == -1){
-                cout << "No spanning tree exists\n";
-                return;
-            }
-
-            int u = nearest[j];
-            int v = j;
-
-            cout << u << " --> " << v << " = " << min << endl;
-
-            mincost += min;
-            nearest[j] = -1;
-
-            // update nearest values
-            for(int k = 0; k < n; k++){
-                if(nearest[k] != -1 && graph[j][k] < graph[nearest[k]][k]){
-                    nearest[k] = j;
-                }
-            }
-
-            count++;
-        }
-
-        cout << "\nMinimum Total Cost = " << mincost << endl;
-    }
-};
-
-int main(){
-
-    prims p;
-
-    p.create();
-    p.display();
-
-    int start;
-    cout << "\nEnter starting vertex: ";
-    cin >> start;
-
-    p.prims_algorithm(start);
 
     return 0;
 }
@@ -175,58 +96,146 @@ FILE: README.md
 
 
 ====================
-FILE: temp.cpp
-====================
-// bishop moves generator
-
-#include <iostream>
-using namespace std;
-
-
-int main(){
-
-    int arr[50] = {0};
-    int j = 0;
-
-    // moves ahead formula: +-8 +- 1(i)
-    for(int i=0; i<7;i++){
-        arr[j] = 8+1*i;
-        j+=1;
-    }
-
-    for(int i=0; i<7;i++){
-        arr[j] = 8-1*i;
-        j+=1;
-    }
-
-    for(int i=0; i<7;i++){
-        arr[j] = -8+1*i;
-        j+=1;
-    }
-
-    for(int i=0; i<7;i++){
-        arr[j] = -8-1*i;
-        j+=1;
-    }
-
-    for (int i = 0; i<50; i++){
-        cout<<arr[i]<<endl;
-    }
-
-
-
-    return 0;
-}
-
-====================
 FILE: ai\engine.cpp
 ====================
+#include "engine.h"
+#include <limits>
 
+using namespace std;
+
+int engine::minimax(Board &board, int depth, bool maximizing){
+
+    move_generator generator;
+    rules rule_engine;
+    eval evaluator;
+
+    // base case
+    if(depth == 0){
+        return evaluator.evaluate(board);
+    }
+
+    vector<Move> pseudoMoves = generator.generate_all_moves(board, maximizing);
+    vector<Move> legalMoves =
+        rule_engine.filter_legal_moves(board, pseudoMoves, maximizing);
+
+    // no moves → checkmate or stalemate
+    if(legalMoves.size() == 0){
+
+        if(rule_engine.is_king_in_check(board, maximizing)){
+            return maximizing ? -100000 : 100000;
+        }
+        else{
+            return 0; // stalemate
+        }
+    }
+
+    if(maximizing){
+
+        int maxEval = numeric_limits<int>::min();
+
+        for(auto &m : legalMoves){
+
+            int captured = board.get_piece(m.to);
+
+            board.make_move(m.from, m.to);
+
+            int eval = minimax(board, depth - 1, false);
+
+            board.undo_move(m.from, m.to, captured);
+
+            maxEval = max(maxEval, eval);
+        }
+
+        return maxEval;
+    }
+    else{
+
+        int minEval = numeric_limits<int>::max();
+
+        for(auto &m : legalMoves){
+
+            int captured = board.get_piece(m.to);
+
+            board.make_move(m.from, m.to);
+
+            int eval = minimax(board, depth - 1, true);
+
+            board.undo_move(m.from, m.to, captured);
+
+            minEval = min(minEval, eval);
+        }
+
+        return minEval;
+    }
+}
+
+
+Move engine::find_best_move(Board &board, bool whiteTurn, int depth){
+
+    move_generator generator;
+    rules rule_engine;
+
+    vector<Move> pseudoMoves = generator.generate_all_moves(board, whiteTurn);
+    vector<Move> legalMoves =
+        rule_engine.filter_legal_moves(board, pseudoMoves, whiteTurn);
+
+    Move bestMove = legalMoves[0];
+
+    int bestValue = whiteTurn ? numeric_limits<int>::min()
+                             : numeric_limits<int>::max();
+
+    for(auto &m : legalMoves){
+
+        int captured = board.get_piece(m.to);
+
+        board.make_move(m.from, m.to);
+
+        int eval = minimax(board, depth - 1, !whiteTurn);
+
+        board.undo_move(m.from, m.to, captured);
+
+        if(whiteTurn){
+            if(eval > bestValue){
+                bestValue = eval;
+                bestMove = m;
+            }
+        }
+        else{
+            if(eval < bestValue){
+                bestValue = eval;
+                bestMove = m;
+            }
+        }
+    }
+
+    return bestMove;
+}
 
 ====================
 FILE: ai\engine.h
 ====================
+#ifndef ENGINE_H
+#define ENGINE_H
 
+#include "../board/Board.h"
+#include "../moves/Move.h"
+#include "../moves/move_generator.h"
+#include "../rules/rules.h"
+#include "../eval/eval.h"
+#include <vector>
+
+using std::vector;
+
+class engine {
+
+public:
+    Move find_best_move(Board &board, bool whiteTurn, int depth);
+
+private:
+    int minimax(Board &board, int depth, bool maximizing);
+};
+
+#endif
 
 ====================
 FILE: board\Board.cpp
@@ -254,8 +263,8 @@ Board::Board(){
             board[0] = 1; // white rook WR at A1
             board[1] = 2; // white knight WN at B1
             board[2] = 3; // white bishop WB at C1
-            board[3] = 4; // white king WK at D1
-            board[4] = 5; // white queen
+            board[3] = 4; // white queen WQ at D1
+            board[4] = 5; // white king
             board[5] = 3; // bishop again
             board[6] = 2; board[7] = 1;
 
@@ -272,8 +281,8 @@ Board::Board(){
             board[56] = -1; // black rook BR at A8
             board[57] = -2; // black knight WN at B8
             board[58] = -3; // black bishop WB at C8
-            board[59] = -4; // black king WK at D8
-            board[60] = -5; // black queen
+            board[59] = -4; // black queen WQ at D8
+            board[60] = -5; // black king
             board[61] = -3; // bishop again
             board[62] = -2; board[63] = -1;
 
@@ -298,6 +307,11 @@ void Board::make_move(int from_index, int to_index){
             board[to_index] = board[from_index];
             board[from_index] = 0;
         }
+
+void Board::undo_move(int from_index, int to_index, int captured_piece){
+    board[from_index] = board[to_index];
+    board[to_index] = captured_piece;
+}
 
 
 
@@ -324,6 +338,7 @@ class Board{
         int get_piece(int index);
         void set_piece(int index, int val);
         void make_move(int from_index, int to_index);
+        void undo_move(int from_index, int to_index, int captured_piece);
 
 
 };
@@ -343,11 +358,13 @@ using namespace std;
 
 void Printer::print_board(Board &board){
 
-    cout << "\nCurrent Board Position:\n\n";
+    cout << "\n    A   B   C   D   E   F   G   H\n";
 
-    for(int row = 7; row >= 0; row--){   // 8 → 1
+    for(int row = 7; row >= 0; row--){
 
-        cout << row + 1 << "   ";        // Rank label
+        cout << "  +---+---+---+---+---+---+---+---+\n";
+
+        cout << row+1 << " |";
 
         for(int col = 0; col < 8; col++){
 
@@ -355,41 +372,42 @@ void Printer::print_board(Board &board){
             int piece = board.get_piece(index);
 
             print_piece(piece);
-            cout << "   ";
+
+            cout << "|";
         }
 
-        cout << endl << endl;
+        cout << " " << row+1 << endl;
     }
+
+    cout << "  +---+---+---+---+---+---+---+---+\n";
 
     cout << "    A   B   C   D   E   F   G   H\n\n";
 }
 
-
 void Printer::print_piece(int piece){
 
     if(piece == 0){
-        cout << ".";
+        cout << " . ";
         return;
     }
 
     if(piece > 0){
-        if(piece == 1) cout << "WR";
-        if(piece == 2) cout << "WN";
-        if(piece == 3) cout << "WB";
-        if(piece == 4) cout << "WK";
-        if(piece == 5) cout << "WQ";
-        if(piece == 6) cout << "WP";
+        if(piece == 1) cout << "WR ";
+        if(piece == 2) cout << "WN ";
+        if(piece == 3) cout << "WB ";
+        if(piece == 4) cout << "WQ ";
+        if(piece == 5) cout << "WK ";
+        if(piece == 6) cout << "WP ";
     }
     else{
-        if(piece == -1) cout << "BR";
-        if(piece == -2) cout << "BN";
-        if(piece == -3) cout << "BB";
-        if(piece == -4) cout << "BK";
-        if(piece == -5) cout << "BQ";
-        if(piece == -6) cout << "BP";
+        if(piece == -1) cout << "BR ";
+        if(piece == -2) cout << "BN ";
+        if(piece == -3) cout << "BB ";
+        if(piece == -4) cout << "BQ ";
+        if(piece == -5) cout << "BK ";
+        if(piece == -6) cout << "BP ";
     }
 }
-
 
 ====================
 FILE: display\Printer.h
@@ -412,12 +430,51 @@ class Printer{
 ====================
 FILE: eval\eval.cpp
 ====================
+#include "eval.h"
 
+int eval::evaluate(Board &board){
+
+    int score = 0;
+
+    for(int i = 0; i < 64; i++){
+
+        int piece = board.get_piece(i);
+
+        switch(piece){
+
+            case 6: score += 100; break;   // pawn
+            case 2: score += 320; break;   // knight
+            case 3: score += 330; break;   // bishop
+            case 1: score += 500; break;   // rook
+            case 4: score += 900; break;   // queen
+            case 5: score += 10000; break; // king
+
+            case -6: score -= 100; break;
+            case -2: score -= 320; break;
+            case -3: score -= 330; break;
+            case -1: score -= 500; break;
+            case -4: score -= 900; break;
+            case -5: score -= 10000; break;
+        }
+    }
+
+    return score;
+}
 
 ====================
 FILE: eval\eval.h
 ====================
+#ifndef EVAL_H
+#define EVAL_H
 
+#include "../board/Board.h"
+
+class eval {
+public:
+    int evaluate(Board &board);
+};
+
+#endif
 
 ====================
 FILE: game\game.cpp
@@ -441,18 +498,26 @@ Move input_handler::get_move_from_user(Board &board){
 
     string from, to;
 
-    cout << "Enter move (example: e2 e4): ";
-    cin >> from >> to;
+    while(true){
 
-    int fromIndex = notation_to_index(from);
-    int toIndex   = notation_to_index(to);
+        cout << "Enter move (example: e2 e4): ";
+        cin >> from >> to;
 
-    Move move;
-    move.from = fromIndex;
-    move.to   = toIndex;
-    move.captured_piece = board.get_piece(toIndex);
+        if(from.length() != 2 || to.length() != 2){
+            cout << "Invalid format! Use: e2 e4\n";
+            continue;
+        }
 
-    return move;
+        int fromIndex = notation_to_index(from);
+        int toIndex   = notation_to_index(to);
+
+        Move move;
+        move.from = fromIndex;
+        move.to   = toIndex;
+        move.captured_piece = board.get_piece(toIndex);
+
+        return move;
+    }
 }
 
 
@@ -539,10 +604,10 @@ vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
         else if(absPiece == 3) // bishop
             generate_bishop_moves(board, i, white_turn, moves);
 
-        else if(absPiece == 4)
+        else if(absPiece == 5)
             generate_king_moves(board, i, white_turn, moves);
 
-        else if(absPiece == 5)
+        else if(absPiece == 4)
             generate_queen_moves(board, i, white_turn, moves);
     }
 
@@ -553,46 +618,67 @@ vector<Move> move_generator::generate_all_moves(Board &board, bool white_turn){
 
 void move_generator::generate_pawn_moves(Board &board, int pos, bool white_turn, vector<Move> &moves){
 
-    int dir = white_turn ? 8 : -8; // white pawn goes front => +8
+    int dir = white_turn ? 8 : -8; 
 
-    int forward = pos + dir; 
+    int forward = pos + dir;
 
-    if(forward >=0 && forward <64 && board.get_piece(forward)==0){
-        moves.push_back({pos, forward, 0});  // from, to, captured_piece
-    }
-    // if forward is empty i.e ==0 , only then pawn going ahead is valid
+    // single forward move
+    if(forward >= 0 && forward < 64 && board.get_piece(forward) == 0){
 
-    // now lets c diagonal capturing
-    int diag1 = pos + dir + 1;
-    int diag2 = pos + dir - 1;
+        moves.push_back({pos, forward, 0});
 
+        // double forwarding
+        int start_rank = white_turn ? 1 : 6;
+        int row = pos / 8;
 
-    // checks to avoid wrap arounds
-    int new_row = diag1/8; int new_col = diag1%8;
-    int old_row = pos/8; int old_col = pos%8;
+        int double_forward = pos + 2*dir;
 
-    if(diag1>=0 && diag1<64){
+        if(row == start_rank &&
+           double_forward >= 0 && double_forward < 64 &&
+           board.get_piece(double_forward) == 0){
 
-        if (abs(new_col - old_col)==1){
-            int target = board.get_piece(diag1); // whats on diag1
-            if(white_turn && is_black_piece(target)) // if it is enemy piece
-                moves.push_back({pos,diag1,target}); // capturing is possible
-            if(!white_turn && is_white_piece(target)) 
-                moves.push_back({pos,diag1,target});
+            moves.push_back({pos, double_forward, 0});
         }
     }
 
-    // repeat
-    new_row = diag2/8; new_col = diag2%8;
-    old_row = pos/8; old_col = pos%8;
+    // diagonal capture squares
+    int diag1 = pos + dir + 1;
+    int diag2 = pos + dir - 1;
 
-    if(diag2>=0 && diag2<64){
-        if (abs(new_col - old_col)==1){
-            int target = board.get_piece(diag2);
+    int old_row = pos / 8;
+    int old_col = pos % 8;
+
+    // capture right
+    if(diag1 >= 0 && diag1 < 64){
+
+        int new_col = diag1 % 8;
+
+        if(abs(new_col - old_col) == 1){
+
+            int target = board.get_piece(diag1);
+
             if(white_turn && is_black_piece(target))
-                moves.push_back({pos,diag2,target});
+                moves.push_back({pos, diag1, target});
+
             if(!white_turn && is_white_piece(target))
-                moves.push_back({pos,diag2,target});
+                moves.push_back({pos, diag1, target});
+        }
+    }
+
+    // capture left
+    if(diag2 >= 0 && diag2 < 64){
+
+        int new_col = diag2 % 8;
+
+        if(abs(new_col - old_col) == 1){
+
+            int target = board.get_piece(diag2);
+
+            if(white_turn && is_black_piece(target))
+                moves.push_back({pos, diag2, target});
+
+            if(!white_turn && is_white_piece(target))
+                moves.push_back({pos, diag2, target});
         }
     }
 }
@@ -928,9 +1014,110 @@ private:
 ====================
 FILE: rules\rules.cpp
 ====================
+#include "rules.h"
+#include <vector>
 
+using namespace std;
+
+//////////////////////// SQUARE ATTACK DETECTION ////////////////////////
+
+bool rules::is_square_attacked(Board &board, int square, bool byWhite){
+
+    move_generator generator;
+
+    // generate all moves for attacking side
+    vector<Move> moves = generator.generate_all_moves(board, byWhite);
+
+    for(auto &m : moves){
+        if(m.to == square)
+            return true;
+    }
+
+    return false;
+}
+
+
+//////////////////////// KING CHECK DETECTION ////////////////////////
+
+bool rules::is_king_in_check(Board &board, bool whiteKing){
+
+    int kingSquare = -1;
+
+    // find the king
+    for(int i = 0; i < 64; i++){
+
+        int piece = board.get_piece(i);
+
+        if(whiteKing && piece == 5){
+            kingSquare = i;
+            break;
+        }
+
+        if(!whiteKing && piece == -5){
+            kingSquare = i;
+            break;
+        }
+    }
+
+    if(kingSquare == -1)
+        return false;
+
+    // check if enemy attacks king square
+    return is_square_attacked(board, kingSquare, !whiteKing);
+}
+
+
+//////////////////////// LEGAL MOVE FILTER ////////////////////////
+
+vector<Move> rules::filter_legal_moves(Board &board,
+                                       vector<Move> &pseudoMoves,
+                                       bool whiteTurn){
+
+    vector<Move> legalMoves;
+
+    for(auto &m : pseudoMoves){
+
+        int captured = board.get_piece(m.to);
+
+        // make move
+        board.make_move(m.from, m.to);
+
+        // check if own king is in check
+        bool kingInCheck = is_king_in_check(board, whiteTurn);
+
+        // undo move
+        board.undo_move(m.from, m.to, captured);
+
+        if(!kingInCheck)
+            legalMoves.push_back(m);
+    }
+
+    return legalMoves;
+}
 
 ====================
 FILE: rules\rules.h
 ====================
+#ifndef RULES_H
+#define RULES_H
 
+#include "../board/Board.h"
+#include "../moves/Move.h"
+#include "../moves/move_generator.h"
+#include <vector>
+
+using std::vector;
+
+class rules {
+
+public:
+    bool is_square_attacked(Board &board, int square, bool byWhite);
+
+    bool is_king_in_check(Board &board, bool whiteKing);
+
+    vector<Move> filter_legal_moves(Board &board,
+                                    vector<Move> &pseudoMoves,
+                                    bool whiteTurn);
+};
+
+#endif
