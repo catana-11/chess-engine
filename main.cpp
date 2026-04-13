@@ -159,7 +159,7 @@ int main(){
         ////////////////////////////////////////////////
         else if(line.find("go") != string::npos){
 
-            int depth = 5;
+            int depth = 7;
 
             stringstream ss(line);
             string token;
