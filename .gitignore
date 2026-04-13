@@ -72,7 +72,8 @@ Testing/
 .git/*
 .git/
 script.py
-project_dump.txt
+
 .exe
 script.py
-.vscode/*
+.vscode
+project_dump.txt
