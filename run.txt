@@ -1,0 +1,1 @@
+g++ -std=c++17 -O2 main.cpp ai/engine.cpp board/Board.cpp display/printer.cpp input/input_handler.cpp moves/move_generator.cpp rules/rules.cpp eval/eval.cpp -o chess.exe

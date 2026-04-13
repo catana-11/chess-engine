@@ -1,0 +1,25 @@
+[Event "?"]
+[Site "?"]
+[Date "2026.04.13"]
+[Round "?"]
+[White "Guest1"]
+[Black "13aprdepth5_2"]
+[Result "1-0"]
+[ECO "B02"]
+[GameDuration "00:01:42"]
+[GameEndTime "2026-04-13T18:15:57.160 India Standard Time"]
+[GameStartTime "2026-04-13T18:14:14.209 India Standard Time"]
+[Opening "Alekhine's defense"]
+[PlyCount "43"]
+[Termination "illegal move"]
+[TimeControl "40/300"]
+
+1. e4 Nf6 2. Nc3 {1.2s} d6 3. Nf3 {1.0s} g6 {0.73s} 4. d4 {1.3s} Bg7 {1.1s}
+5. Be3 {2.7s} Bg4 {1.6s} 6. Be2 {1.7s} Nbd7 {1.2s} 7. O-O {2.7s} Nxe4 {1.1s}
+8. Nxe4 {1.9s} f5 {1.5s} 9. Neg5 {5.7s} Bf6 {0.97s} 10. Bc4 {11s} Bxg5 {1.0s}
+11. Bxg5 {2.3s} h6 {1.1s} 12. Bd2 {7.2s} Nb6 {1.1s} 13. Bb5+ {4.4s} c6
+14. Bd3 {2.9s} Qb8 {0.99s} 15. d5 {2.1s} Na4 {0.72s} 16. dxc6 {3.0s}
+bxc6 {0.63s} 17. h3 {3.5s} Nxb2 {0.96s} 18. Qe2 {11s} Bh5 {0.94s}
+19. Rab1 {2.7s} Qb7 {1.2s} 20. g4 {4.0s} fxg4 {1.3s} 21. hxg4 {2.8s} Bxg4 {1.1s}
+22. Bxg6+ {4.0s, Black makes an illegal move: e8g8} 1-0
+

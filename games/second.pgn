@@ -1,0 +1,27 @@
+[Event "Computer chess game"]
+[Site "CATANA"]
+[Date "2026.04.07"]
+[Round "?"]
+[White "Guest1"]
+[Black "sha-engine-2"]
+[Result "1/2-1/2"]
+[BlackElo "2000"]
+[ECO "B00"]
+[Opening "King's Pawn"]
+[Time "18:16:45"]
+[WhiteElo "2400"]
+[TimeControl "300"]
+[Termination "normal"]
+[PlyCount "89"]
+[WhiteType "human"]
+[BlackType "program"]
+
+1. e4 f6 2. Nc3 e6 3. Nf3 Bb4 4. a3 Bxc3 5. dxc3 g5 6. h3 d5 7. exd5 exd5
+8. Bd3 Kf7 9. O-O h5 10. Nd4 Rh6 11. g4 hxg4 12. hxg4 Kg7 13. Ne6+ Bxe6 14.
+c4 dxc4 15. Bxc4 Bxc4 16. Re1 Rh4 17. f3 Qxd1 18. Rxd1 Kg6 19. c3 b6 20. a4
+a5 21. Kg2 c5 22. Kg3 Ne7 23. f4 Bb3 24. Rd6 Rh1 25. f5+ Kg7 26. Rxb6 Rg1+
+27. Kf3 Bd5+ 28. Kf2 Rxg4 29. Rb5 Nxf5 30. Rxc5 Ne7 31. b4 axb4 32. cxb4
+Rxb4 33. Rc7 Kf8 34. Rc3 Raxa4 35. Rxa4 Rxa4 36. Ba3 f5 37. Bxe7+ Kxe7 38.
+Rc7+ Ke8 39. Rc8+ Ke7 40. Rxb8 Ba2 41. Rb7+ Ke8 42. Rb8+ Ke7 43. Rb7+ Ke8
+44. Rb8+ Ke7 {3-fold repetition} 45. Rb7+ {3-fold repetition} 1/2-1/2
+

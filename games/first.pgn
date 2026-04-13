@@ -1,0 +1,25 @@
+[Event "Computer chess game"]
+[Site "CATANA"]
+[Date "2026.04.07"]
+[Round "?"]
+[White "Guest1"]
+[Black "sha-engine-1"]
+[Result "1-0"]
+[BlackElo "2000"]
+[ECO "B00"]
+[Opening "St. George Defence"]
+[Time "17:36:58"]
+[WhiteElo "2400"]
+[TimeControl "300"]
+[Termination "rules infraction"]
+[PlyCount "63"]
+[WhiteType "human"]
+[BlackType "program"]
+
+1. e4 a6 2. Nc3 a5 3. Nf3 a4 4. a3 e6 5. d4 b6 6. Bb5 c6 7. Bc4 b5 8. Bd3
+f6 9. e5 f5 10. h3 d5 11. exd6 Qxd6 12. Ne5 g6 13. h4 b4 14. axb4 Qxb4 15.
+Bd2 Qxb2 16. Nxc6 Nxc6 17. Bb5 Bd7 18. Rb1 Qa3 19. Ba6 Rxa6 20. Nb5 Qe7 21.
+Nc7+ Kd8 22. Nxa6 Bc8 23. O-O Bxa6 24. Re1 a3 25. Ra1 Bb7 26. c3 Nb8 27.
+Qb3 Kc8 28. Rxe6 Ba8 29. Rxe7 Bxe7 30. Rxa3 Bxa3 31. Qxa3 Bb7 32. c4 {Arena
+Adjudication. Illegal move!} 1-0
+
