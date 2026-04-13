@@ -51,6 +51,7 @@ For CuteChess, compile with UCI code in main.cpp.
 CuteChess --> Tools --> Settings --> Engines --> (+) --> Add the path to chess.exe
 ```
 
+Best rating yet: Depth 7: 2000 estimated ELO
 ---
 
 ### Made by
