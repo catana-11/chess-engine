@@ -82,10 +82,10 @@ int main(){
             // AI (BLACK)
             cout << "\nAI thinking...\n";
 
-            Move bestMove = ai.find_best_move(B, whiteTurn, 3);
+            Move bestMove = ai.find_best_move(B, whiteTurn, 4);
 
             cout << "AI played: "
-                << bestMove.from << " -> " << bestMove.to << endl;
+                << bestMove.from << " --> " << bestMove.to << endl;
 
             B.make_move(bestMove.from, bestMove.to);
         }
